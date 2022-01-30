@@ -20,12 +20,12 @@ typedef struct s_data
     int             time_die;
     int             time_eat;
     int             time_sleep;
-    int             repeat;
+    int             num_eat;
     long long       launch_time;
     pthread_mutex_t *fork;
     pthread_mutex_t print;
     t_status        status;
-    int             *list;
+    int             *list_id;
     
 }               t_data;
 
