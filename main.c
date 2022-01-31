@@ -58,12 +58,17 @@ int *init_list(t_data *data)
         i++;
         philo_id += 2;
     }
-    return (list_id);  
+
+    /*printf("init list_id[i] = ");
+    for(i = 0; i < data->philo_nbr; i++)
+        printf("%d ", list_id[i]);
+    printf("\n");*/
+    return (list_id);
 }
 
 void    update_list_id(t_data *data, int philo_id)
 {
-    //printf("UPDATElist_id, philo_id = %d\n", philo_id);
+    //printf("UPDATE list_id, philo_id = %d\n", philo_id);
     int i;
 
     i = 0;
@@ -74,7 +79,7 @@ void    update_list_id(t_data *data, int philo_id)
     }
     data->list_id[i] = philo_id;
 
-    /*printf("list_id[i] = ");
+    /*printf("list_id[i] updated = ");
     for(i = 0; i < data->philo_nbr; i++)
         printf("%d ", data->list_id[i]);
     printf("\n");*/
@@ -195,7 +200,10 @@ void    *is_dead(void *philo_i)
 
     philo = philo_i;
     while (1)
+    {
+        //printf("GO CHECK STATUS\n");
         check_status(philo);
+    }
 }
 ///////////////// SMART SLEEP ///////////////////////////////////////
 void    smart_sleep(long long time_eat, t_philo *philo)
@@ -224,17 +232,18 @@ void    smart_sleep(long long time_eat, t_philo *philo)
 /////////////////////// SERVE FORK //////////////////////////////////
 void    serve_fork(t_philo *philo)
 {
-    //printf("Lock mutex to serve fork [philo->id - 1] = %d\n", philo->id -1);
+    //printf("\nFORK, philo_id = %d\n", philo->id);
+    //printf("Lock mutex to serve fork[%d] > philo->id - 1\n", philo->id -1);
     pthread_mutex_lock(&philo->data->fork[philo->id - 1]);  
     print_status(philo, "has taken a fork");
     if (philo->id == philo->data->philo_nbr)
     {
-        //printf("Lock mutex to serve fork [0] -> if id = philo_nbr = %d\n", philo->data->philo_nbr);
+        //printf("\nLock mutex to serve fork[0] -> if philo->id = philo_nbr = %d\n", philo->data->philo_nbr);
         pthread_mutex_lock(&philo->data->fork[0]);
     }
     else
     {
-        //printf("Lock mutex to serve fork [philo->id] = %d\n", philo->id);
+        //printf("\nLock mutex to serve fork[%d] > philo->id\n", philo->id);
         pthread_mutex_lock(&philo->data->fork[philo->id]);
     }
     print_status(philo, "has taken a fork after 2");
@@ -244,23 +253,24 @@ void    serve_fork(t_philo *philo)
 /////////////////////// EAT ///////////////////////////////////////
 void    eating(t_philo *philo)
 {
+    //printf("\nEAT, philo_id = %d\n", philo->id);
     print_status(philo, "is eating");
     philo->last_meal = get_time_ms();
     philo->num_eaten++;
     //printf("philo eaten = %d\n", philo->num_eaten);
 
     smart_sleep(philo->data->time_eat, philo);
-    //printf("Unloock mutex after eat fork [philo->id - 1] = %d\n", philo->id -1);
+    //printf("Unloock mutex after eat fork[%d] philo->id - 1\n", philo->id -1);
     pthread_mutex_unlock(&philo->data->fork[philo->id -1]);
 
     if (philo->id == philo->data->philo_nbr)
     {
-        //printf("Unlock mutex after eat fork [0] -> if id = philo_nbr = %d\n", philo->data->philo_nbr);
+        //printf("Unlock mutex after eat fork[0] -> if philo_id = philo_nbr = %d\n", philo->data->philo_nbr);
         pthread_mutex_unlock(&philo->data->fork[0]);
     }
     else
     {
-        //printf("Unlock mutex after eat fork [philo->id] = %d\n", philo->id);
+        //printf("Unlock mutex after eat fork[%d] philo->id\n", philo->id);
         pthread_mutex_unlock(&philo->data->fork[philo->id]);
     }
 }
@@ -300,9 +310,9 @@ void    *routine(void *philo_i)
     return (0);
 }
 
+///////////////////// THREADS PER PHILO ///////////////////////////
 int create_threads(t_philo *philo)
 {
-    //printf("CREATE THREADS\n");
     pthread_t   *threads;
     int         i;
 
@@ -310,6 +320,7 @@ int create_threads(t_philo *philo)
     threads = malloc(sizeof(pthread_t) * (philo->data->philo_nbr));
     while (i < philo->data->philo_nbr)
     {
+        //printf("CREATE THREADS\n");
         pthread_create(&threads[i], NULL, routine, &philo[i]);
         i++;
     }
@@ -328,19 +339,38 @@ int create_threads(t_philo *philo)
     return(0);
 }
 
+//////////////////// CHECK ARG ///////////////////////////
+int check_arg(int argc, char **argv)
+{
+    if (argc > 4 && argc <= 6)
+    {
+        if (ft_atoi(argv[1]) < 1)
+            return (printf("Need at least 1 philosopher.\n"));
+        if (ft_atoi(argv[2]) < 1)
+            return (printf("Time to die must be at least 1.\n"));
+        if (ft_atoi(argv[3]) < 1)
+            return (printf("Time to eat must be at least 1.\n"));
+        if (ft_atoi(argv[4]) < 1)
+            return (printf("Time to sleep must be at least 1.\n"));
+        if (argc == 6 && ft_atoi(argv[5]) < 1)
+            return (printf("Number of time to repeat must be at least 1.\n"));
+    }
+    else
+		return (printf("Bad arguments :	[number_of_philosophers] [time_to_die] \
+        [time_to_eat] [time_to_sleep]\nOPTIONAL :	\
+        number_of_times_to_repeat]\n"));
+    return (0);
+}
+
 int main(int argc, char **argv)
 {
     t_data *data;
     t_philo *philo;
-    //check_arg;
-    if (argc != 6)
-		printf("bad arg : nbr_philo, time to die, time to eat, time to sleep,\n");
-
-    //parse data
+    
+    if (check_arg(argc, argv) != 0)
+        return (1);
     data = parse_data(argc, argv);
-    //init philo
     philo = init_philos(data);
     create_threads(philo);
-
-    //return (0);
+    return (0);
 }
