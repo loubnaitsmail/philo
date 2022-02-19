@@ -257,6 +257,8 @@ void    eating(t_philo *philo)
     printf("philo eaten = %d\n", philo->num_eaten);
 
     smart_sleep(philo->data->time_eat, philo);
+    //go_sleep(philo->data->time_eat);
+
 
     printf("Unloock mutex after eat fork [philo->id - 1] = %d\n", philo->id -1);
     pthread_mutex_unlock(&philo->data->fork[philo->id -1]);

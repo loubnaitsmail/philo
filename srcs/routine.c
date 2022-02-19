@@ -13,6 +13,7 @@ void    *is_dead(void *philo_i)
         check_status(philo);
     }
 }
+
 ///////////////// SMART SLEEP ///////////////////////////////////////
 void    smart_sleep(long long time_eat, t_philo *philo)
 {
@@ -36,7 +37,22 @@ void    smart_sleep(long long time_eat, t_philo *philo)
         usleep(50);
     }
 }
+//sleep 
+int	go_sleep(useconds_t usec)
+{
+	useconds_t		before;
+	useconds_t		after;
 
+	before = get_time_ms();
+	after = before;
+	while (after - before < usec)
+	{
+		if (usleep(usec) == -1)
+			return (-1);
+		after = get_time_ms();
+	}
+	return (0);
+}
 /////////////////////// SERVE FORK //////////////////////////////////
 void    serve_fork(t_philo *philo)
 {
@@ -67,7 +83,8 @@ void    eating(t_philo *philo)
     philo->num_eaten++;
     //printf("philo eaten = %d\n", philo->num_eaten);
 
-    smart_sleep(philo->data->time_eat, philo);
+    //smart_sleep(philo->data->time_eat, philo);
+    go_sleep(philo->data->time_eat);
     //printf("Unloock mutex after eat fork[%d] philo->id - 1\n", philo->id -1);
     pthread_mutex_unlock(&philo->data->fork[philo->id -1]);
 
@@ -110,7 +127,8 @@ void    *routine(void *philo_i)
                 && philo->num_eaten == philo->data->num_eat)
                 break;
             print_status(philo, "\033[1;95mis sleeping 🌙\033[0;39m");
-            smart_sleep(philo->data->time_sleep, philo);
+            go_sleep(philo->data->time_sleep);
+            //smart_sleep(philo->data->time_sleep, philo);
             print_status(philo, "\033[1;90mis thinking 💭\033[0;39m");
         }
         check_status(philo);

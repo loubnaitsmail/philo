@@ -63,6 +63,7 @@ void    smart_sleep(long long time_eat, t_philo *philo);
 void    serve_fork(t_philo *philo);
 void    eating(t_philo *philo);
 void    *routine(void *philo_i);
+int	go_sleep(useconds_t usec);
 
 
 #endif

@@ -13,6 +13,32 @@ long long   get_time_ms(void)
     return(time_ms);
 }
 
+//////////////////// CHECK STATUT /////////////////////////////////
+t_status    check_status(t_philo    *philo)
+{
+    //printf("CHECK STATUS\n");
+    long long   time_ms;
+
+    time_ms = get_time_ms();
+    if (philo->last_meal == 0)
+        philo->last_meal = get_time_ms() - 1;
+    //printf("last meal was 0 -> %lld\n", philo->last_meal);
+
+    if (philo->data->status == dead)
+    {
+        //printf("Status was DEAD\n");
+        return (dead);
+    }
+    if (time_ms - philo->last_meal > philo->data->time_die)
+    {
+        print_dead(philo);
+        //printf("Status is now DEAD\n");
+        return (dead);
+    }
+    //printf("Status is still ALIVE\n");
+    return (alive);
+}
+
 /////////////////  PRINT DEAD  ////////////////////////////////////
 void    print_dead(t_philo *philo)
 {
@@ -46,30 +72,4 @@ void    print_status(t_philo *philo, char *str)
     
     //printf("Unlock after print status\n");
     pthread_mutex_unlock(&philo->data->print);
-}
-
-//////////////////// CHECK STATUT /////////////////////////////////
-t_status    check_status(t_philo    *philo)
-{
-    //printf("CHECK STATUS\n");
-    long long   time_ms;
-
-    time_ms = get_time_ms();
-    if (philo->last_meal == 0)
-        philo->last_meal = get_time_ms() - 1;
-    //printf("last meal was 0 -> %lld\n", philo->last_meal);
-
-    if (philo->data->status == dead)
-    {
-        //printf("Status was DEAD\n");
-        return (dead);
-    }
-    if (time_ms - philo->last_meal > philo->data->time_die)
-    {
-        print_dead(philo);
-        //printf("Status is now DEAD\n");
-        return (dead);
-    }
-    //printf("Status is still ALIVE\n");
-    return (alive);
 }

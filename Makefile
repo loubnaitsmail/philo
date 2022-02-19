@@ -2,7 +2,7 @@
 NAME	=	philo
  
 CC		=	gcc
-CFLAGS	=	-Wall -Wextra -Werror -g
+CFLAGS	=	-pthread -Wall -Wextra -Werror -g
 IFLAGS	=	-I. -I includes
 BFLAGS	=	0
  

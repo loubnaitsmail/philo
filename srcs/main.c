@@ -54,21 +54,19 @@ int check_arg(int argc, char **argv)
 {
     if (argc > 4 && argc <= 6)
     {
-        if (ft_atoi(argv[1]) < 1)
-            return (printf("Need at least 1 philosopher.\n"));
+        if (ft_atoi(argv[1]) < 1 || ft_atoi(argv[1]) > 200)
+            return (printf("Need at least 1 philosopher and no more then 200.\n"));
         if (ft_atoi(argv[2]) < 1)
             return (printf("Time to die must be at least 1.\n"));
         if (ft_atoi(argv[3]) < 1)
             return (printf("Time to eat must be at least 1.\n"));
-        if (ft_atoi(argv[4]) < 1)
-            return (printf("Time to sleep must be at least 1.\n"));
+        if (ft_atoi(argv[4]) < 60)
+            return (printf("Time to sleep must be at least 60ms.\n"));
         if (argc == 6 && ft_atoi(argv[5]) < 1)
             return (printf("Number of time to repeat must be at least 1.\n"));
     }
     else
-		return (printf("Bad arguments :	[number_of_philosophers] [time_to_die] \
-        [time_to_eat] [time_to_sleep]\nOPTIONAL :	\
-        number_of_times_to_repeat]\n"));
+		return (printf("Bad arguments :[number_of_philosophers][time_to_die][time_to_eat][time_to_sleep]\nOPTIONAL : number_of_times_to_repeat]\n"));
     return (0);
 }
 
